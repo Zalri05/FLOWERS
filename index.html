@@ -68,41 +68,46 @@
     }
 
     .controls {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 35px;
+    margin-top: 25px;
+    padding: 10px;
     }
 
     .control-btn {
-        width: clamp(50px, 10vw, 70px);
-        height: clamp(50px, 10vw, 70px);
+    width: 85px;
+    height: 85px;
 
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-        font-size: clamp(24px, 4vw, 32px);
-        font-weight: bold;
-        line-height: 1;
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1;
 
-        background-color: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        padding: 0;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
 
-        transition: transform 0.1s ease;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: transform 0.1s ease;
     }
 
     .control-btn:hover {
-        transform: scale(1.1);
+    transform: scale(1.05);
     }
 
     .control-btn:active {
-        transform: scale(0.95);
+    transform: scale(0.90);
     }
 
     #bouquet-page img {
@@ -162,15 +167,15 @@
     let basketPosition = 50;
 
     function moveBasket(direction) {
-        const step = 5;
+         const step = 1.5;
 
         if (direction === "left") {
-            basketPosition = Math.max(10, basketPosition - step);
+             basketPosition = Math.max(5, basketPosition - step);
         } else if (direction === "right") {
-            basketPosition = Math.min(90, basketPosition + step);
+            basketPosition = Math.min(95, basketPosition + step);
         }
 
-        basket.style.left = basketPosition + "%";
+       basket.style.left = basketPosition + "%";
     }
 
     document.addEventListener("keydown", (event) => {
@@ -185,12 +190,45 @@
         }
     });
 
-    leftBtn.addEventListener("click", () => {
-        moveBasket("left");
+    let movingDirection = null;
+    let movementInterval = null;
+
+    function startMoving(direction) {
+        stopMoving();
+
+        movingDirection = direction;
+
+        movementInterval = setInterval(() => {
+            moveBasket(movingDirection);
+        }, 16);
+    }
+
+    function stopMoving() {
+        movingDirection = null;
+
+        if (movementInterval) {
+            clearInterval(movementInterval);
+            movementInterval = null;
+        }
+    }
+
+    // Left button
+    leftBtn.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        startMoving("left");
     });
 
-    rightBtn.addEventListener("click", () => {
-        moveBasket("right");
+    // Right button
+    rightBtn.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        startMoving("right");
+    });
+
+    // Stop when released
+    document.addEventListener("pointerup", stopMoving);
+    document.addEventListener("pointercancel", stopMoving);
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopMoving();
     });
 
     function createHeart() {
